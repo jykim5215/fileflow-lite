@@ -165,7 +165,7 @@ FileFlow-Lite/
 
 ## 9. 현재 상태
 
-**v0.2.0 탐색기 네이티브 구현과 로컬 배포 검증 완료, GitHub CI/릴리스 게시 진행 중.**
+**v0.2.0 탐색기 네이티브 구현·로컬/CI 검증·GitHub Release 게시 완료. 실제 사용자 UAC 설치 확인만 남음.**
 
 - C# Core, WPF Worker, C++ Shell, MSIX 매니페스트, 설치/제거, App Installer, CI를 구현했다.
 - Core 테스트 12/12, WPF 빌드, C++ `/W4 /WX` 빌드가 통과했다.
@@ -180,4 +180,8 @@ FileFlow-Lite/
 - 최종 MSIX에는 허용한 실행 파일, DLL, 매니페스트, 아이콘과 Windows 생성 서명 메타데이터만 있으며 개발 파일은 없다.
 - 포함 CER과 MSIX 서명 지문이 일치하고 DigiCert 타임스탬프가 존재한다. ZIP/MSIX SHA-256은 `SHA256SUMS.txt`와 일치한다.
 - 자동화 세션에서 UAC가 보안 데스크톱으로 전달되지 않아 실제 MSIX 설치는 아직 완료하지 못했다. 사용자가 배포 ZIP의 설치 CMD를 직접 실행하면 검증을 이어갈 수 있다.
-- 다음 단계는 Git 커밋/CI와 v0.2.0 GitHub Release 게시, 이후 실제 사용자 UAC 설치 및 탐색기 메뉴 확인이다.
+- PR `#1`을 병합했고 PR 검증 실행 `29207661308`과 태그 릴리스 실행 `29207762655`가 모두 성공했다.
+- v0.2.0 릴리스: `https://github.com/jykim5215/fileflow-lite/releases/tag/v0.2.0`
+- 원격 릴리스의 MSIX와 ZIP을 다시 내려받아 게시된 SHA-256과 일치함을 확인했고, `releases/latest/download` App Installer/MSIX URL도 HTTP 200으로 확인했다.
+- 기존 v0.1 워크플로가 `v*` 태그에 반응해 올린 구형 EXE/portable ZIP은 v0.2.0 릴리스에서 제거했다. 레거시 워크플로 트리거를 `v0.1.*`로 제한해 재발을 막았다.
+- 다음 단계는 사용자가 ZIP의 `Install-FileFlowLite.cmd`를 실행해 UAC를 승인한 뒤 실제 탐색기 메뉴 표시, 테스트 폴더 미리보기·적용·Undo를 확인하는 것이다.
