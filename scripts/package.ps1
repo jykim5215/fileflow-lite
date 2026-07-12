@@ -2,9 +2,9 @@ $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $Package = Join-Path $Root 'dist-package'
 $Exe = Join-Path $Root 'dist\FileFlow-Lite.exe'
-if (-not (Test-Path $Exe)) { throw '먼저 scripts\build.ps1을 실행하세요.' }
+if (-not (Test-Path $Exe)) { throw 'Run scripts\build.ps1 first.' }
 $resolvedPackage = (Resolve-Path $Package).Path
-if (-not $resolvedPackage.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase)) { throw '패키지 경로가 프로젝트 밖입니다.' }
+if (-not $resolvedPackage.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase)) { throw 'Package path is outside the project.' }
 Get-ChildItem -LiteralPath $Package -Force | Where-Object { $_.Name -ne '.gitkeep' } | Remove-Item -Recurse -Force
 $portable = Join-Path $Package 'portable'
 New-Item -ItemType Directory -Path $portable -Force | Out-Null
@@ -22,4 +22,3 @@ $lines = foreach ($asset in $assets) {
 [System.IO.File]::WriteAllLines((Join-Path $Package 'SHA256SUMS.txt'), $lines, [System.Text.UTF8Encoding]::new($false))
 Remove-Item -LiteralPath $portable -Recurse -Force
 Write-Host "Packaged: $Package"
-
