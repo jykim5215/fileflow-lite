@@ -219,7 +219,7 @@ Windows가 여러 선택 파일을 레지스트리 명령 하나에 안정적으
 
 ## 10. 현재 상태
 
-**v0.1.0 구현·검증·패키징 완료, GitHub 공개 진행 중.**
+**v0.1.0 구현·검증·패키징·GitHub 공개 완료.**
 
 - 배포 패키지 폴더 `FileFlow-Lite`를 생성했다.
 - 요구사항, 안전 정책, 기술 방향, UX 흐름, 탐색기 통합, GitHub 업데이트 방향을 이 문서에 정리했다.
@@ -239,7 +239,10 @@ Windows가 여러 선택 파일을 레지스트리 명령 하나에 안정적으
 - 최종 EXE 시작 스모크 테스트를 통과했다.
 - 배포 ZIP은 `FileFlow-Lite.exe`, `README.md`, `LICENSE`만 포함한다. 사용자명·로컬 경로·비밀정보 패턴이 검출되지 않았고 게시된 SHA-256이 실제 파일과 일치한다.
 - 현재 PC의 바탕 화면에 `FileFlow Lite.lnk`를 만들고, HKCU 범위의 우클릭 메뉴 3개를 등록했다. 관리자 권한은 사용하지 않았다.
-- 다음 작업은 인증된 GitHub 계정의 공개 저장소 `jykim5215/fileflow-lite`에 소스를 게시하고 v0.1.0 릴리스 자산을 업로드하는 것이다.
+- 공개 소스 저장소: `https://github.com/jykim5215/fileflow-lite`
+- v0.1.0 릴리스: `https://github.com/jykim5215/fileflow-lite/releases/tag/v0.1.0`
+- 릴리스 자산으로 단일 EXE, 휴대용 ZIP, `SHA256SUMS.txt`를 게시했다.
+- 앱의 업데이트 확인 엔드포인트가 위 저장소를 가리키며 현재 v0.1.0이 최신 버전으로 정상 인식된다.
 
 ## 11. 확정된 운영 결정
 
