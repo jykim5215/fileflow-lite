@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FileFlow Lite UI 후보 B — 탐색기 친화형</title>
+  <style>
+    :root{--blue:#176fc1;--blue-2:#e7f2fc;--line:#d5d9de;--soft:#f5f6f7;--ink:#202124;--muted:#62666b;--danger:#c42b1c}
+    *{box-sizing:border-box}body{margin:0;background:#e7ebef;color:var(--ink);font-family:"Segoe UI",sans-serif;font-size:13px;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.window{width:min(1480px,calc(100vw - 36px));height:calc(100vh - 36px);min-height:720px;margin:18px auto;background:white;border:1px solid #aeb4ba;box-shadow:0 18px 45px rgba(38,49,59,.18);display:grid;grid-template-rows:34px 50px 1fr 30px;overflow:hidden}
+    .titlebar{display:flex;align-items:center;padding-left:11px;border-bottom:1px solid #e3e5e7;position:relative}.mini-logo{width:22px;height:18px;background:#e8b949;border-radius:2px;margin-right:8px;position:relative}.mini-logo:before{content:"";position:absolute;width:10px;height:4px;left:1px;top:-3px;background:#e8b949}.title{font-size:12px}.win-buttons{margin-left:auto;display:flex;height:100%}.win-buttons span{width:46px;display:grid;place-items:center;color:#474747}.win-buttons span:last-child:hover{background:var(--danger);color:white}.ribbon{display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid var(--line);gap:6px;background:#fbfbfb}.tool{border:1px solid transparent;background:transparent;border-radius:4px;padding:7px 10px;display:flex;gap:7px;align-items:center}.tool:hover{background:#eef3f7;border-color:#d6e1ea}.tool.primary{background:var(--blue);color:white}.sep{width:1px;height:25px;background:#d9dde0;margin:0 3px}.tool.right{margin-left:auto}.undo-off{color:#999}.body{display:grid;grid-template-columns:210px 1fr;min-height:0}.sidebar{background:#fafafa;border-right:1px solid var(--line);padding:10px 7px}.tree-label{font-size:11px;text-transform:uppercase;color:#777;padding:7px 10px}.tree{display:grid;gap:2px}.tree button{background:transparent;border:0;text-align:left;padding:7px 10px;border-radius:4px;color:#353535}.tree button.active{background:#ddecf9;color:#0f5f9f}.tree .icon{display:inline-block;width:25px}.info-box{margin:17px 7px 0;padding:11px;border:1px solid #d9e1e7;background:#fff;font-size:11px;color:#626970;line-height:1.5}
+    .content{display:grid;grid-template-rows:46px auto 1fr auto;min-width:0;min-height:0}.pathbar{display:flex;align-items:center;padding:7px 12px;gap:7px;border-bottom:1px solid #e0e2e4}.back{border:0;background:transparent;font-size:17px;color:#596269;padding:2px 7px}.crumb{height:31px;border:1px solid #bfc5ca;display:flex;align-items:center;flex:1;background:white;padding:0 9px}.crumb span{padding:0 6px;color:#454b50}.crumb b{color:#7c8388;font-weight:400}.search{width:210px;border:1px solid #bfc5ca;height:31px;padding:0 10px}.options{padding:13px 15px;background:#fafbfc;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1.3fr 1.3fr .7fr .9fr auto;gap:12px;align-items:end}.field label{display:block;font-size:11px;color:#555;margin-bottom:4px}.combo,.path-input{width:100%;height:31px;border:1px solid #b8bec4;background:white;padding:0 8px}.path-cell{display:flex}.path-input{border-right:0}.pick{width:34px;border:1px solid #b8bec4;background:#f7f7f7}.radio-row{display:flex;height:31px;align-items:center;gap:12px}.radio-row input,.checkline input{accent-color:var(--blue)}.preview-btn{height:32px;border:1px solid #0f5fa7;background:var(--blue);color:white;padding:0 14px}
+    .file-area{display:grid;grid-template-columns:1fr 300px;min-height:0}.list{overflow:auto;border-right:1px solid var(--line)}table{border-collapse:collapse;width:100%;font-size:12px}th{position:sticky;top:0;text-align:left;background:#f5f6f7;border-bottom:1px solid var(--line);font-weight:400;color:#484c50;padding:7px 9px}td{border-bottom:1px solid #eee;padding:7px 9px;white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis}tr.selected{background:#e5f2ff}tr:hover{background:#f2f7fb}.kind{color:#697076}.state{color:#196b2d}.collision{color:#9b5b00}.details{background:#fafafa;padding:16px}.details h3{margin:0 0 14px;font-size:15px}.big-folder{width:74px;height:56px;background:#e9bc4d;border-radius:4px;margin:8px auto 18px;position:relative;box-shadow:inset 0 -8px rgba(205,145,20,.13)}.big-folder:before{content:"";position:absolute;width:34px;height:10px;background:#e9bc4d;top:-7px;border-radius:4px 4px 0 0}.kv{display:grid;grid-template-columns:82px 1fr;gap:9px;font-size:11px;border-top:1px solid #dedede;padding-top:12px}.kv dt{color:#666}.kv dd{margin:0;overflow:hidden;text-overflow:ellipsis}.warning{margin-top:18px;padding:10px;background:#fff6e5;border:1px solid #f0d493;color:#704c00;font-size:11px;line-height:1.45}.checkline{display:flex;gap:8px;align-items:center;margin-top:13px;font-size:12px}.applybar{border-top:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;background:#fafafa}.result{font-size:12px}.result b{color:#075fae}.applybar button{margin-left:auto;border:1px solid #0f5fa7;background:var(--blue);color:white;padding:8px 17px}.statusbar{display:flex;align-items:center;padding:0 10px;border-top:1px solid #d7dade;background:#f6f6f6;font-size:11px;color:#555}.statusbar span+span{border-left:1px solid #ccc;margin-left:12px;padding-left:12px}.privacy{margin-left:auto!important;border:0!important}.candidate{position:fixed;right:28px;top:29px;color:#175a90;background:#eef6fd;border:1px solid #acccea;padding:5px 9px;border-radius:3px;font-size:11px}
+    @media(max-width:1050px){.options{grid-template-columns:1fr 1fr}.file-area{grid-template-columns:1fr}.details{display:none}.body{grid-template-columns:175px 1fr}}
+  </style>
+</head>
+<body>
+<div class="candidate">후보 B · 탐색기 친화형</div>
+<div class="window">
+  <div class="titlebar"><i class="mini-logo"></i><span class="title">FileFlow Lite — 파일 정리</span><div class="win-buttons"><span>—</span><span>□</span><span>×</span></div></div>
+  <div class="ribbon">
+    <button class="tool primary">▱ 폴더 평탄화</button><button class="tool">⇢ 순번 이름짓기</button><i class="sep"></i>
+    <button class="tool">▤ 작업 기록</button><button class="tool undo-off">↶ 실행 취소</button>
+    <button class="tool right">⚙ 설정</button><button class="tool">? 도움말</button>
+  </div>
+  <div class="body">
+    <aside class="sidebar">
+      <div class="tree-label">작업</div>
+      <div class="tree"><button class="active"><span class="icon">▱</span>폴더 평탄화</button><button><span class="icon">⇢</span>순번 이름짓기</button></div>
+      <div class="tree-label">바로 가기</div>
+      <div class="tree"><button><span class="icon">⌂</span>바탕 화면</button><button><span class="icon">▣</span>다운로드</button><button><span class="icon">▤</span>문서</button><button><span class="icon">▧</span>사진</button></div>
+      <div class="info-box"><b>안전 모드 사용 중</b><br>시스템 파일과 연결된 폴더를 건너뛰고 기존 파일을 덮어쓰지 않습니다.</div>
+    </aside>
+    <main class="content">
+      <div class="pathbar"><button class="back">←</button><button class="back">↑</button><div class="crumb"><span>이 PC</span><b>›</b><span>사진</span><b>›</b><span>정리할 사진</span></div><input class="search" placeholder="미리보기에서 검색"></div>
+      <section class="options">
+        <div class="field"><label>원본 폴더</label><div class="path-cell"><input class="path-input" value="D:\정리할 사진"><button class="pick">…</button></div></div>
+        <div class="field"><label>대상 폴더</label><div class="path-cell"><input class="path-input" value="D:\모아둔 사진"><button class="pick">…</button></div></div>
+        <div class="field"><label>처리 방식</label><div class="radio-row"><label><input type="radio" checked> 복사</label><label><input type="radio"> 이동</label></div></div>
+        <div class="field"><label>이름 충돌</label><select class="combo"><option>순번 자동 부여</option><option>폴더명 접두어</option></select></div>
+        <button class="preview-btn">미리보기 만들기</button>
+      </section>
+      <section class="file-area">
+        <div class="list">
+          <table>
+            <thead><tr><th>이름</th><th>원본 하위 폴더</th><th>변경 후 이름</th><th>크기</th><th>수정한 날짜</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr class="selected"><td>IMG_1024.jpg</td><td>여행\제주</td><td>IMG_1024.jpg</td><td>4.2 MB</td><td>2025-08-14 18:42</td><td class="state">복사 준비</td></tr>
+              <tr><td>IMG_1024.jpg</td><td>여행\부산</td><td>IMG_1024 (2).jpg</td><td>5.1 MB</td><td>2025-07-02 09:12</td><td class="collision">이름 조정</td></tr>
+              <tr><td>portrait.png</td><td>가족\2025</td><td>portrait.png</td><td>8.7 MB</td><td>2025-05-05 14:30</td><td class="state">복사 준비</td></tr>
+              <tr><td>screen-01.png</td><td>캡처</td><td>screen-01.png</td><td>812 KB</td><td>2025-02-11 11:23</td><td class="state">복사 준비</td></tr>
+              <tr><td>sea.heic</td><td>여행\강릉</td><td>sea.heic</td><td>3.8 MB</td><td>2024-12-22 16:21</td><td class="state">복사 준비</td></tr>
+              <tr><td>receipt.jpg</td><td>문서\영수증</td><td>receipt.jpg</td><td>1.2 MB</td><td>2024-10-30 19:54</td><td class="state">복사 준비</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="details">
+          <h3>미리보기 세부 정보</h3><div class="big-folder"></div>
+          <dl class="kv"><dt>전체 항목</dt><dd>128개 파일</dd><dt>예상 크기</dt><dd>1.84 GB</dd><dt>이름 충돌</dt><dd>3개 · 자동 해결</dd><dt>제외 항목</dt><dd>2개 · 보호 파일</dd><dt>여유 공간</dt><dd>42.7 GB</dd></dl>
+          <div class="warning"><b>확인할 내용</b><br>이름이 같은 파일 3개에 순번을 붙입니다. 기존 대상 파일은 변경하지 않습니다.</div>
+          <label class="checkline"><input type="checkbox" checked> 숨김·시스템 파일 제외</label>
+          <label class="checkline"><input type="checkbox" disabled> 이동 후 빈 폴더 삭제</label>
+        </aside>
+      </section>
+      <div class="applybar"><div class="result"><b>128개</b> 파일을 복사할 준비가 되었습니다. 적용 전 파일 상태를 다시 검사합니다.</div><button>미리보기대로 적용…</button></div>
+    </main>
+  </div>
+  <footer class="statusbar"><span>128개 항목</span><span>선택한 항목 1개</span><span class="privacy">● 로컬 처리 · 외부 전송 없음</span></footer>
+</div>
+</body>
+</html>

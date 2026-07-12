@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FileFlow Lite UI 후보 A — 차분한 대시보드</title>
+  <style>
+    :root{--bg:#f3f6f9;--surface:#fff;--surface-2:#f8fafb;--ink:#17232e;--muted:#667685;--line:#dce4ea;--accent:#087e72;--accent-2:#dff4ef;--warning:#b45f06;--danger:#b42318;--shadow:0 14px 36px rgba(25,47,65,.09)}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(145deg,#edf5f3 0,#f5f7fa 48%,#edf1f5 100%);font-family:"Segoe UI",sans-serif;color:var(--ink);min-height:100vh}
+    button,input,select{font:inherit} button{cursor:pointer}.app{width:min(1440px,calc(100vw - 48px));height:calc(100vh - 48px);min-height:720px;margin:24px auto;background:var(--surface);border:1px solid #dce5e8;border-radius:20px;box-shadow:var(--shadow);display:grid;grid-template-columns:230px 1fr;overflow:hidden}
+    aside{background:#17313a;color:#e9f4f2;padding:25px 18px;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;padding:0 8px 26px}.logo{width:38px;height:34px;background:#42c6b7;border-radius:8px 8px 10px 10px;position:relative;box-shadow:inset 0 -5px 0 rgba(0,0,0,.08)}.logo:before{content:"";position:absolute;width:18px;height:7px;border-radius:5px 5px 0 0;background:#42c6b7;top:-5px;left:3px}.logo:after{content:"↘";color:#17313a;position:absolute;inset:3px 0 0;text-align:center;font-size:22px;font-weight:800}
+    nav{display:grid;gap:7px}.nav{border:0;background:transparent;color:#b9cacd;text-align:left;padding:12px 13px;border-radius:10px;display:flex;align-items:center;gap:10px}.nav.active{background:#29505a;color:white;font-weight:650}.nav span{width:22px;text-align:center}.aside-foot{margin-top:auto;border-top:1px solid #36515a;padding-top:14px}.status{font-size:12px;color:#a7bcbe;display:flex;align-items:center;gap:7px;padding:8px}.dot{width:7px;height:7px;background:#55d6a5;border-radius:50%}
+    main{background:var(--surface-2);display:grid;grid-template-rows:auto auto 1fr auto;min-width:0}.topbar{padding:24px 30px 15px;display:flex;align-items:center;justify-content:space-between}.topbar h1{font-size:24px;margin:0 0 5px;letter-spacing:-.5px}.topbar p{margin:0;color:var(--muted);font-size:13px}.undo{border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:9px;color:#334b59}.undo:disabled{color:#9ba7ae;background:#f3f5f6}
+    .steps{margin:0 30px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 18px;display:flex;align-items:center}.step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);white-space:nowrap}.step b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#e8eef1;color:#536672;font-size:12px}.step.active{color:var(--accent);font-weight:700}.step.active b{background:var(--accent);color:white}.rule{height:1px;background:var(--line);flex:1;margin:0 12px;min-width:25px}
+    .workspace{padding:0 30px 24px;display:grid;grid-template-columns:minmax(430px,.95fr) minmax(470px,1.25fr);gap:18px;min-height:0}.panel{background:white;border:1px solid var(--line);border-radius:14px;min-width:0;overflow:hidden}.panel-head{padding:18px 20px;border-bottom:1px solid #e7ecef;display:flex;align-items:center;justify-content:space-between}.panel-head h2{font-size:15px;margin:0}.badge{font-size:11px;background:var(--accent-2);color:#10685f;padding:4px 8px;border-radius:999px;font-weight:700}.form{padding:18px 20px;display:grid;gap:16px}.field label,.group-title{font-size:12px;font-weight:700;color:#415764;display:block;margin-bottom:7px}.path{display:flex;gap:7px}.path input{min-width:0;flex:1;border:1px solid #cfd9df;border-radius:8px;padding:10px 11px;color:#516470;background:#fbfcfd}.browse{border:1px solid #bdcbd3;background:white;border-radius:8px;padding:0 12px;color:#31505d}.drop{border:1.5px dashed #aebdc5;border-radius:10px;background:#f8fbfc;padding:18px;text-align:center;color:#657984;font-size:13px}.drop strong{color:#245966}.seg{display:grid;grid-template-columns:1fr 1fr;background:#edf1f3;padding:3px;border-radius:9px}.seg button{border:0;background:transparent;padding:8px;border-radius:7px;color:#5a6c77}.seg button.on{background:#fff;color:#126d64;font-weight:700;box-shadow:0 2px 6px rgba(30,55,70,.12)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.select{width:100%;border:1px solid #cfd9df;border-radius:8px;padding:9px;background:white;color:#354d59}.check{display:flex;align-items:center;gap:9px;font-size:13px;color:#405460}.check input{accent-color:var(--accent);width:16px;height:16px}.hint{font-size:11px;color:#7b8991;margin-top:5px}
+    .preview{display:grid;grid-template-rows:auto auto 1fr}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:13px 16px;background:#fbfcfd;border-bottom:1px solid #e7ecef}.metric{padding:10px;border-radius:9px;background:#f1f6f6}.metric strong{display:block;font-size:17px}.metric span{font-size:11px;color:var(--muted)}.metric.warn{background:#fff4e8}.metric.warn strong{color:var(--warning)}
+    .table-wrap{overflow:auto}.table-tools{display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e7ecef}.filter{font-size:12px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;background:white;color:#50636d}.table{width:100%;border-collapse:collapse;font-size:12px}.table th{text-align:left;color:#6b7b84;background:#f7f9fa;padding:9px 12px;position:sticky;top:0}.table td{padding:10px 12px;border-top:1px solid #edf0f2;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.arrow{color:#9aa6ac;padding:0 3px}.ok{color:#147761;font-weight:650}.warn-txt{color:var(--warning);font-weight:650}
+    .bottom{border-top:1px solid var(--line);background:#fff;padding:14px 30px;display:flex;justify-content:space-between;align-items:center}.safe{color:#60727d;font-size:12px;display:flex;align-items:center;gap:8px}.shield{color:var(--accent);font-size:16px}.actions{display:flex;gap:9px}.secondary,.primary{border-radius:9px;padding:10px 17px;font-weight:650}.secondary{background:white;border:1px solid #cbd6db;color:#3d5561}.primary{border:1px solid var(--accent);background:var(--accent);color:white;box-shadow:0 5px 12px rgba(8,126,114,.18)}
+    .note{position:fixed;right:33px;top:34px;background:#15343c;color:white;padding:9px 13px;border-radius:8px;font-size:11px;box-shadow:var(--shadow)}
+    @media(max-width:1000px){.app{grid-template-columns:80px 1fr}.brand b,.nav em,.aside-foot{display:none}.nav{justify-content:center}.workspace{grid-template-columns:1fr}.preview{min-height:390px}}
+  </style>
+</head>
+<body>
+<div class="note">후보 A · 차분한 대시보드</div>
+<div class="app">
+  <aside>
+    <div class="brand"><i class="logo"></i><b>FileFlow Lite</b></div>
+    <nav>
+      <button class="nav active"><span>▱</span><em>폴더 평탄화</em></button>
+      <button class="nav"><span>⇢</span><em>순번 이름짓기</em></button>
+      <button class="nav"><span>↶</span><em>작업 기록</em></button>
+      <button class="nav"><span>⚙</span><em>설정</em></button>
+    </nav>
+    <div class="aside-foot">
+      <div class="status"><i class="dot"></i> 모든 처리는 이 PC에서</div>
+      <button class="nav"><span>?</span><em>도움말</em></button>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div><h1>폴더 평탄화</h1><p>하위 폴더의 파일을 한 곳으로 안전하게 모읍니다.</p></div>
+      <button class="undo" disabled>↶ 직전 작업 실행 취소</button>
+    </header>
+    <div class="steps">
+      <div class="step active"><b>1</b> 범위와 규칙</div><i class="rule"></i>
+      <div class="step active"><b>2</b> 미리보기</div><i class="rule"></i>
+      <div class="step"><b>3</b> 확인 및 적용</div>
+    </div>
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-head"><h2>정리할 위치</h2><span class="badge">기본값: 복사</span></div>
+        <div class="form">
+          <div class="drop">폴더를 여기에 놓거나 <strong>찾아보기</strong></div>
+          <div class="field"><label>원본 폴더</label><div class="path"><input value="D:\정리할 사진" readonly><button class="browse">찾기</button></div></div>
+          <div class="field"><label>대상 폴더</label><div class="path"><input value="D:\모아둔 사진" readonly><button class="browse">찾기</button></div></div>
+          <div><span class="group-title">처리 방식</span><div class="seg"><button class="on">복사 · 안전 권장</button><button>이동</button></div></div>
+          <div class="two">
+            <div class="field"><label>이름 충돌</label><select class="select"><option>순번 자동 부여</option><option>폴더명 접두어</option></select></div>
+            <div class="field"><label>파일 필터</label><select class="select"><option>모든 일반 파일</option><option>사진만</option><option>문서만</option></select></div>
+          </div>
+          <label class="check"><input type="checkbox" checked> 숨김·시스템 파일 제외</label>
+          <label class="check"><input type="checkbox" disabled> 완료 후 빈 폴더 삭제 <span class="hint">(이동 시 사용)</span></label>
+        </div>
+      </div>
+      <div class="panel preview">
+        <div class="panel-head"><h2>실행 전 미리보기</h2><span class="badge">검사 완료</span></div>
+        <div class="summary">
+          <div class="metric"><strong>128</strong><span>복사할 파일</span></div>
+          <div class="metric"><strong>1.84 GB</strong><span>예상 용량</span></div>
+          <div class="metric warn"><strong>3</strong><span>이름 충돌 해결</span></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-tools"><button class="filter">전체 128 ▾</button><button class="filter">⌕ 목록 검색</button></div>
+          <table class="table">
+            <thead><tr><th>변경 전</th><th></th><th>변경 후</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>여행\제주\IMG_1024.jpg</td><td class="arrow">→</td><td>모아둔 사진\IMG_1024.jpg</td><td class="ok">복사</td></tr>
+              <tr><td>여행\부산\IMG_1024.jpg</td><td class="arrow">→</td><td>모아둔 사진\IMG_1024 (2).jpg</td><td class="warn-txt">이름 조정</td></tr>
+              <tr><td>가족\2025\portrait.png</td><td class="arrow">→</td><td>모아둔 사진\portrait.png</td><td class="ok">복사</td></tr>
+              <tr><td>캡처\screen-01.png</td><td class="arrow">→</td><td>모아둔 사진\screen-01.png</td><td class="ok">복사</td></tr>
+              <tr><td>여행\강릉\sea.heic</td><td class="arrow">→</td><td>모아둔 사진\sea.heic</td><td class="ok">복사</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <footer class="bottom">
+      <div class="safe"><span class="shield">◆</span> 기존 파일을 덮어쓰지 않습니다. 적용 전 상태를 다시 확인합니다.</div>
+      <div class="actions"><button class="secondary">미리보기 새로고침</button><button class="primary">128개 파일 적용…</button></div>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

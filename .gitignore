@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.tmp
+.venv/
+.pytest_cache/
+build/
+dist/
+*.spec
+dist-package/*
+!dist-package/.gitkeep
+assets/fileflow.ico
+assets/fileflow.png
+.env
+.DS_Store
+Thumbs.db
+
