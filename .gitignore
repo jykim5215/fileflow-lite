@@ -13,4 +13,13 @@ assets/fileflow.png
 .env
 .DS_Store
 Thumbs.db
-
+native/**/bin/
+native/**/obj/
+native/**/x64/
+native/**/.vs/
+native/**/*.user
+build-v2/
+dist-v2/
+packaging/msix/Assets/*.png
+packaging/msix/*.pfx
+packaging/msix/*.cer

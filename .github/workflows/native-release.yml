@@ -1,0 +1,102 @@
+name: native-explorer-build
+
+on:
+  push:
+    tags: ["v0.2.*"]
+  pull_request:
+    paths:
+      - ".github/workflows/native-release.yml"
+      - "native/**"
+      - "packaging/msix/**"
+      - "scripts/build-v2.ps1"
+      - "scripts/generate_msix_assets.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-native:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Prepare assets
+        run: |
+          python -m pip install pillow
+          python scripts/generate_icon.py
+          python scripts/generate_msix_assets.py
+      - name: Test native core
+        run: dotnet run --project native/FileFlow.Core.Tests/FileFlow.Core.Tests.csproj -c Release
+      - name: Publish Fluent worker
+        shell: pwsh
+        run: dotnet publish native/FileFlow.Worker/FileFlow.Worker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o build-v2/worker
+      - name: Build Explorer command DLL
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+          & $msbuild native\FileFlow.Shell\FileFlow.Shell.vcxproj /t:Build /p:Configuration=Release /p:Platform=x64 /m
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Pack and sign MSIX
+        shell: pwsh
+        env:
+          SIGNING_PFX: ${{ secrets.FILEFLOW_PFX_B64 }}
+          SIGNING_PASSWORD: ${{ secrets.FILEFLOW_PFX_PASSWORD }}
+        run: |
+          if (-not $env:SIGNING_PFX -or -not $env:SIGNING_PASSWORD) { throw 'Signing secrets are missing.' }
+          $stage = 'build-v2\package'
+          $dist = 'dist-v2'
+          New-Item -ItemType Directory -Path $stage,$dist -Force | Out-Null
+          Copy-Item 'build-v2\worker\FileFlow.Worker.exe' $stage
+          Copy-Item 'native\FileFlow.Shell\x64\Release\FileFlow.Shell.dll' $stage
+          Copy-Item 'packaging\msix\AppxManifest.xml' $stage
+          New-Item -ItemType Directory -Path (Join-Path $stage 'Assets') | Out-Null
+          Copy-Item 'packaging\msix\Assets\*.png' (Join-Path $stage 'Assets')
+          $sdk = Get-ChildItem (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\bin') -Directory | Sort-Object Name -Descending | Where-Object { Test-Path (Join-Path $_.FullName 'x64\makeappx.exe') } | Select-Object -First 1
+          $makeappx = Join-Path $sdk.FullName 'x64\makeappx.exe'
+          $signtool = Join-Path $sdk.FullName 'x64\signtool.exe'
+          $msix = Join-Path $dist 'FileFlow-Lite-Explorer.msix'
+          & $makeappx pack /d $stage /p $msix /o
+          $pfx = Join-Path $env:RUNNER_TEMP 'fileflow.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:SIGNING_PFX))
+          & $signtool sign /fd SHA256 /f $pfx /p $env:SIGNING_PASSWORD /tr 'http://timestamp.digicert.com' /td SHA256 $msix
+          $password = ConvertTo-SecureString $env:SIGNING_PASSWORD -AsPlainText -Force
+          $certificate = Import-PfxCertificate -FilePath $pfx -Password $password -CertStoreLocation 'Cert:\CurrentUser\My'
+          Export-Certificate -Cert $certificate -FilePath (Join-Path $dist 'FileFlow-Lite.cer') -Force | Out-Null
+          Remove-Item -LiteralPath $pfx -Force
+          Copy-Item 'packaging\msix\FileFlow-Lite.appinstaller','packaging\msix\Install-FileFlowLite.cmd','packaging\msix\Install-FileFlowLite.ps1','packaging\msix\Uninstall-FileFlowLite.ps1','README.md','LICENSE' $dist
+          Compress-Archive -Path "$dist\*" -DestinationPath "$dist\FileFlow-Lite-Explorer-v0.2.0.zip" -CompressionLevel Optimal -Force
+          $files = @("$dist\FileFlow-Lite-Explorer.msix", "$dist\FileFlow-Lite-Explorer-v0.2.0.zip")
+          $lines = foreach ($file in $files) { '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant(), [IO.Path]::GetFileName($file) }
+          [IO.File]::WriteAllLines("$dist\SHA256SUMS.txt", $lines, [Text.UTF8Encoding]::new($false))
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: FileFlow-Lite-Explorer-Windows11
+          path: dist-v2/*
+  release:
+    if: startsWith(github.ref, 'refs/tags/v0.2.')
+    needs: windows-native
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: FileFlow-Lite-Explorer-Windows11
+          path: dist-v2
+      - name: Publish v0.2 release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist-v2/FileFlow-Lite-Explorer.msix
+            dist-v2/FileFlow-Lite-Explorer-v0.2.0.zip
+            dist-v2/FileFlow-Lite.appinstaller
+            dist-v2/FileFlow-Lite.cer
+            dist-v2/SHA256SUMS.txt

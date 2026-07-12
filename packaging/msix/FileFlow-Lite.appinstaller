@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+              Uri="https://github.com/jykim5215/fileflow-lite/releases/latest/download/FileFlow-Lite.appinstaller"
+              Version="0.2.0.0">
+  <MainPackage Name="FileFlowLite.Explorer"
+               Publisher="CN=FileFlow Lite"
+               Version="0.2.0.0"
+               ProcessorArchitecture="x64"
+               Uri="https://github.com/jykim5215/fileflow-lite/releases/latest/download/FileFlow-Lite-Explorer.msix" />
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="24" ShowPrompt="true" UpdateBlocksActivation="false" />
+    <AutomaticBackgroundTask />
+  </UpdateSettings>
+</AppInstaller>
